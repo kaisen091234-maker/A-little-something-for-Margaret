@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Heart for Margaregg❤️</title>
+
+<style>
+    :root {
+        --heart: #ff4f91;
+        --glow: #ff8fc0;
+        --bg: #100914;
+        --text: #fff0f7;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        background:
+            radial-gradient(ellipse at center, #301329 0%, #160b1d 55%, #080610 100%);
+        color: var(--text);
+        font-family: "Segoe UI", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #universe {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .widget {
+        position: relative;
+        z-index: 2;
+        width: min(340px, 94vw);
+        padding: 22px 18px 20px;
+        text-align: center;
+        border: 1px solid #ff8fc044;
+        border-radius: 24px;
+        background: #170c1ddd;
+        box-shadow:
+            0 0 35px #ff3d8d22,
+            inset 0 0 25px #ff70b00b;
+        backdrop-filter: blur(12px);
+    }
+
+    .eyebrow {
+        font-size: 10px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: #ff9cc9;
+        margin-bottom: 4px;
+    }
+
+    h1 {
+        font-size: 23px;
+        margin: 5px 0 0;
+        font-weight: 650;
+        letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+        font-size: 11px;
+        color: #cba5bf;
+        margin: 7px 0 0;
+    }
+
+    .heart-area {
+        position: relative;
+        height: 230px;
+        margin: 5px 0;
+        display: grid;
+        place-items: center;
+    }
+
+    #heartCanvas {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    .hint {
+        font-size: 10px;
+        color: #bda0b7;
+        margin-top: -2px;
+    }
+
+    .message-box {
+        position: relative;
+        margin-top: 15px;
+        min-height: 90px;
+        padding: 14px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-radius: 16px;
+        background: #ff7eb510;
+        border: 1px solid #ff8fc02b;
+        transition: border-color 0.3s, background 0.3s;
+    }
+
+    .message-box:hover {
+        border-color: #ff8fc088;
+        background: #ff7eb518;
+    }
+
+    .message-label {
+        color: #ff94c2;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 9px;
+        margin-bottom: 8px;
+    }
+
+    #message {
+        font-size: 15px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+        transition: opacity 0.25s;
+    }
+
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 13px;
+    }
+
+    button {
+        border: 1px solid #ff8fc044;
+        background: #ff7eb512;
+        color: #ffe7f2;
+        border-radius: 10px;
+        padding: 9px 12px;
+        cursor: pointer;
+        font-size: 11px;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background: #ff7eb52b;
+        border-color: #ff8fc099;
+        transform: translateY(-1px);
+    }
+
+    .signature {
+        font-size: 10px;
+        color: #b996ae;
+        margin-top: 15px;
+    }
+
+    .signature span {
+        color: #ff82b4;
+    }
+
+    .mini-toggle {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 5;
+        opacity: 0.7;
+    }
+
+    .mini-toggle:hover {
+        opacity: 1;
+    }
+
+    body.compact {
+        background: transparent;
+        align-items: center;
+    }
+
+    body.compact .widget {
+        width: min(260px, 94vw);
+        padding: 13px 12px;
+        background: #170c1df2;
+    }
+
+    body.compact h1 {
+        font-size: 18px;
+    }
+
+    body.compact .heart-area {
+        height: 165px;
+    }
+
+    body.compact .subtitle,
+    body.compact .hint,
+    body.compact .signature {
+        display: none;
+    }
+
+    body.compact .message-box {
+        min-height: 75px;
+        margin-top: 5px;
+    }
+
+    body.compact .controls {
+        flex-wrap: wrap;
+    }
+
+    @media (max-height: 580px) {
+        .widget {
+            padding: 12px;
+        }
+
+        .heart-area {
+            height: 160px;
+        }
+
+        .subtitle {
+            display: none;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div id="universe">
+    <canvas id="stars"></canvas>
+</div>
+
+<button class="mini-toggle" id="compactButton">Compact mode</button>
+
+<main class="widget">
+
+    <div class="eyebrow">A tiny message from me</div>
+    <h1>Hi, Margarette ♡</h1>
+    <p class="subtitle">A little light for your busy days.</p>
+
+    <div class="heart-area">
+        <canvas id="heartCanvas"></canvas>
+    </div>
+
+    <div class="hint">✧ Hover over the heart or click it ✧</div>
+
+    <section class="message-box">
+        <div class="message-label">✦ Your little reminder ✦</div>
+        <div id="message" aria-live="polite">
+            Hi, Margarette! I'm rooting for you. ♡
+        </div>
+    </section>
+
+    <div class="controls">
+        <button id="nextButton">Next message ♡</button>
+        <button id="burstButton">Make it sparkle ✧</button>
+    </div>
+
+    <div class="signature">
+        Made with pixels and <span>♡</span>, just for you.
+    </div>
+
+</main>
+
+<script>
+/* =========================================================
+   CUSTOMIZE MESSAGES HERE!
+   ========================================================= */
+
+const messages = [
+    "Hi, Marga, I'm rooting for you. ♡",
+    "Don't forget to drink some water, kay?",
+    "Good luck with your schoolwork, you got this.",
+    "Tke a little break when you need one.",
+    "I'm proud of you for working hard. ♡",
+    "Lemme know when you're free",
+    "You don't have to finish everything all at once. One step at a time.",
+    "Remember to eat when you get the chance",
+    "Sending you a pocket-sized hug. ♡",
+    "You're doing great. Don't be too hard on yourself.",
+    "Study well, little one. I'll be cheering for you.",
+    "Goodluck with your deadlines ♡"
+];
+
+/* Change the colors here if you want! */
+const COLORS = {
+    heart: "#ff4f91",
+    bright: "#ffd3e7",
+    glow: "#ff70b5",
+    rays: "#ff9dce"
+};
+
+/* =========================================================
+   MESSAGE CONTROLS
+   ========================================================= */
+
+const messageElement = document.getElementById("message");
+let messageIndex = 0;
+
+function showMessage(index) {
+    messageElement.style.opacity = 0;
+
+    setTimeout(() => {
+        messageIndex = (index + messages.length) % messages.length;
+        messageElement.textContent = messages[messageIndex];
+        messageElement.style.opacity = 1;
+    }, 180);
+}
+
+document.getElementById("nextButton").addEventListener("click", () => {
+    showMessage(messageIndex + 1);
+    burstHeart();
+});
+
+document.getElementById("burstButton").addEventListener("click", burstHeart);
+
+document.getElementById("compactButton").addEventListener("click", () => {
+    document.body.classList.toggle("compact");
+
+    document.getElementById("compactButton").textContent =
+        document.body.classList.contains("compact")
+        ? "Full mode"
+        : "Compact mode";
+
+    resizeHeartCanvas();
+});
+
+/* =========================================================
+   HEART PIXELS + EXPLOSIVE LIGHT RAYS
+   ========================================================= */
+
+const heartCanvas = document.getElementById("heartCanvas");
+const ctx = heartCanvas.getContext("2d");
+
+let width = 0;
+let height = 0;
+let heartPixels = [];
+let particles = [];
+let rays = [];
+let mouse = { x: -999, y: -999 };
+let hover = false;
+let lastBurst = 0;
+
+function resizeHeartCanvas() {
+    const rect = heartCanvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    width = rect.width;
+    height = rect.height;
+
+    heartCanvas.width = Math.round(width * dpr);
+    heartCanvas.height = Math.round(height * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    createHeartPixels();
+}
+
+function heartEquation(x, y) {
+    return Math.pow(x*x + y*y - 1, 3) -
+        x*x*y*y*y <= 0;
+}
+
+function createHeartPixels() {
+    heartPixels = [];
+
+    const scale = Math.min(width / 36, height / 30);
+    const step = 0.65;
+
+    for (let x = -1.4; x <= 1.4; x += step / 10) {
+        for (let y = -1.3; y <= 1.4; y += step / 10) {
+            if (!heartEquation(x, y)) continue;
+
+            // A tiny amount of randomness gives the heart a pixel look.
+            const px = width / 2 + x * scale * 12;
+            const py = height / 2 - y * scale * 12;
+
+            heartPixels.push({
+                x: px + (Math.random() - 0.5) * 1.5,
+                y: py + (Math.random() - 0.5) * 1.5,
+                size: 1.5 + Math.random() * 2.1,
+                phase: Math.random() * Math.PI * 2,
+                speed: 0.6 + Math.random() * 1.7,
+                color: Math.random() < 0.15
+                    ? COLORS.bright
+                    : COLORS.heart
+            });
+        }
+    }
+}
+
+function createParticle(x, y, speedMultiplier = 1) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = (0.5 + Math.random() * 3.5) * speedMultiplier;
+
+    particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 35 + Math.random() * 45,
+        maxLife: 80,
+        size: 1 + Math.random() * 3,
+        color: Math.random() < 0.5 ? COLORS.bright : COLORS.glow
+    });
+}
+
+function burstHeart() {
+    const cx = width / 2;
+    const cy = height / 2;
+
+    for (let i = 0; i < 100; i++) {
+        const p = heartPixels[
+            Math.floor(Math.random() * heartPixels.length)
+        ];
+
+        if (p) createParticle(p.x, p.y, 1.6);
+    }
+
+    // A few bright streaks shoot outward from the center.
+    for (let i = 0; i < 24; i++) {
+        const angle = (Math.PI * 2 * i / 24) +
+                      (Math.random() - 0.5) * 0.2;
+
+        rays.push({
+            x: cx,
+            y: cy,
+            angle,
+            length: 25 + Math.random() * 75,
+            life: 1,
+            decay: 0.018 + Math.random() * 0.02,
+            width: 0.5 + Math.random() * 1.5
+        });
+    }
+}
+
+function drawHeart(time) {
+    ctx.clearRect(0, 0, width, height);
+
+    const cx = width / 2;
+    const cy = height / 2;
+
+    // Rays of light.
+    rays = rays.filter(ray => ray.life > 0);
+
+    for (const ray of rays) {
+        ray.life -= ray.decay;
+
+        const length = ray.length * ray.life;
+
+        ctx.save();
+        ctx.translate(ray.x, ray.y);
+        ctx.rotate(ray.angle);
+
+        ctx.globalAlpha = Math.max(0, ray.life);
+        ctx.strokeStyle = COLORS.rays;
+        ctx.lineWidth = ray.width;
+        ctx.shadowColor = COLORS.glow;
+        ctx.shadowBlur = 12;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(length, 0);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    // Pixel heart with individual twinkles.
+    const pulse = 1 + Math.sin(time * 0.002) * 0.035;
+    const glowStrength = hover ? 20 : 9;
+
+    for (const p of heartPixels) {
+        const twinkle = 0.55 +
+            0.45 * Math.sin(time * 0.003 * p.speed + p.phase);
+
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        let pushX = 0;
+        let pushY = 0;
+
+        if (hover && distance < 55 && distance > 0) {
+            const force = (55 - distance) / 55 * 5;
+            pushX = -(dx / distance) * force;
+            pushY = -(dy / distance) * force;
+        }
+
+        const x = cx + (p.x - cx) * pulse + pushX;
+        const y = cy + (p.y - cy) * pulse + pushY;
+
+        ctx.globalAlpha = 0.6 + twinkle * 0.4;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = COLORS.glow;
+        ctx.shadowBlur = glowStrength * twinkle;
+
+        const size = p.size * (0.85 + twinkle * 0.3);
+
+        ctx.fillRect(x, y, size, size);
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+
+    // Floating sparkles around the heart.
+    if (Math.random() < 0.14) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 65 + Math.random() * 25;
+
+        createParticle(
+            cx + Math.cos(angle) * radius,
+            cy + Math.sin(angle) * radius,
+            0.3
+        );
+    }
+
+    // Animate the particles.
+    particles = particles.filter(p => p.life > 0);
+
+    for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+        p.life--;
+
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+
+    requestAnimationFrame(drawHeart);
+}
+
+heartCanvas.addEventListener("pointermove", event => {
+    const rect = heartCanvas.getBoundingClientRect();
+
+    mouse.x = event.clientX - rect.left;
+    mouse.y = event.clientY - rect.top;
+    hover = true;
+
+    if (Math.random() < 0.22) {
+        createParticle(mouse.x, mouse.y, 0.45);
+    }
+});
+
+heartCanvas.addEventListener("pointerleave", () => {
+    mouse.x = -999;
+    mouse.y = -999;
+    hover = false;
+});
+
+heartCanvas.addEventListener("click", () => {
+    burstHeart();
+
+    showMessage(
+        Math.floor(Math.random() * messages.length)
+    );
+});
+
+/* =========================================================
+   BACKGROUND STARS
+   ========================================================= */
+
+const starCanvas = document.getElementById("stars");
+const starCtx = starCanvas.getContext("2d");
+
+let stars = [];
+
+function resizeStars() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    starCanvas.width = Math.round(innerWidth * dpr);
+    starCanvas.height = Math.round(innerHeight * dpr);
+
+    starCanvas.style.width = innerWidth + "px";
+    starCanvas.style.height = innerHeight + "px";
+
+    starCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    stars = Array.from({ length: 65 }, () => ({
+        x: Math.random() * innerWidth,
+        y: Math.random() * innerHeight,
+        size: 0.5 + Math.random() * 1.5,
+        phase: Math.random() * Math.PI * 2
+    }));
+}
+
+function drawStars(time) {
+    starCtx.clearRect(0, 0, innerWidth, innerHeight);
+
+    for (const star of stars) {
+        starCtx.globalAlpha =
+            0.2 + 0.5 * (0.5 + 0.5 *
+            Math.sin(time * 0.001 + star.phase));
+
+        starCtx.fillStyle = "#ffd6eb";
+        starCtx.fillRect(star.x, star.y, star.size, star.size);
+    }
+
+    starCtx.globalAlpha = 1;
+
+    requestAnimationFrame(drawStars);
+}
+
+/* =========================================================
+   START EVERYTHING
+   ========================================================= */
+
+window.addEventListener("resize", () => {
+    resizeHeartCanvas();
+    resizeStars();
+});
+
+resizeHeartCanvas();
+resizeStars();
+
+requestAnimationFrame(drawHeart);
+requestAnimationFrame(drawStars);
+
+// Give the heart a little opening burst.
+setTimeout(burstHeart, 700);
+
+// Change the displayed message every 45 seconds.
+// Set this to false if you want messages to change only on click.
+const AUTO_MESSAGES = true;
+
+if (AUTO_MESSAGES) {
+    setInterval(() => {
+        showMessage(messageIndex + 1);
+    }, 45000);
+}
+</script>
+
+</body>
+</html>
